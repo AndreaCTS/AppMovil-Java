@@ -1,4 +1,4 @@
-package com.example.appmovil.ui.home;
+package com.example.appmovil.ui.bluetooth;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -11,14 +11,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.appmovil.databinding.FragmentHomeBinding;
-import com.example.appmovil.ui.bluetooth.Bluetooth;
 
-public class HomeFragment extends Fragment {
+public class BluetoothFragment extends Fragment {
 
     private static final int REQUEST_BLUETOOTH_PERMISSIONS = 1;
     private FragmentHomeBinding binding;

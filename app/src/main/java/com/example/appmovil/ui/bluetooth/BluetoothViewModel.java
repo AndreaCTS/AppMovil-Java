@@ -1,14 +1,14 @@
-package com.example.appmovil.ui.home;
+package com.example.appmovil.ui.bluetooth;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class HomeViewModel extends ViewModel {
+public class BluetoothViewModel extends ViewModel {
 
     private final MutableLiveData<String> mText;
 
-    public HomeViewModel() {
+    public BluetoothViewModel() {
         mText = new MutableLiveData<>();
         mText.setValue("This is home fragment");
     }
