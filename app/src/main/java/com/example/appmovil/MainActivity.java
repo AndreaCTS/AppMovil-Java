@@ -3,7 +3,9 @@ package com.example.appmovil;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Menu;
+import android.widget.TextView;
 
+import com.example.appmovil.ui.bluetooth.Bluetooth;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
@@ -18,6 +20,7 @@ import com.example.appmovil.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
 
+    private Bluetooth bluetooth;
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
 
