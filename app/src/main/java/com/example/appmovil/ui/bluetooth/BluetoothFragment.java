@@ -2,11 +2,14 @@ package com.example.appmovil.ui.bluetooth;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,7 +17,13 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.appmovil.R;
 import com.example.appmovil.databinding.FragmentHomeBinding;
+import com.example.appmovil.ui.carros.Vehiculo;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Date;
 
 public class BluetoothFragment extends Fragment {
 
@@ -22,6 +31,9 @@ public class BluetoothFragment extends Fragment {
     private FragmentHomeBinding binding;
     private Bluetooth bluetooth; // Instancia de la clase Bluetooth
     private TextView textView; // TextView para mostrar los datos recibidos
+
+    private ArrayList<Vehiculo> vehiculos;
+    private LinearLayout vehicleContainer;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -31,15 +43,17 @@ public class BluetoothFragment extends Fragment {
 
         // Inicializar el TextView para mostrar los datos
         textView = binding.textHome; // Asumiendo que tienes un TextView en tu layout con id textHome
-
+        this.vehiculos = new ArrayList<>();
         // Inicialización del Bluetooth
-        bluetooth = new Bluetooth("ESP32_Parqueadero");  // Cambia el nombre del dispositivo Bluetooth si es necesario
+        bluetooth = new Bluetooth("S22 Ultra de Laura");  // Cambia el nombre del dispositivo Bluetooth si es necesario
 
         // Verificar si Bluetooth está disponible y habilitado
         if (!bluetooth.isBluetoothAvailable()) {
             textView.setText("Bluetooth no está disponible en este dispositivo.");
+            textView.setVisibility(View.VISIBLE);
         } else if (!bluetooth.isBluetoothEnabled()) {
             textView.setText("Por favor, habilita Bluetooth.");
+            textView.setVisibility(View.VISIBLE);
         } else {
             // Verificar permisos y solicitar si es necesario
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -55,6 +69,11 @@ public class BluetoothFragment extends Fragment {
             }
         }
 
+        vehicleContainer = root.findViewById(R.id.vehicle_container);
+        // Simulación de Bluetooth OnDataReceivedListener
+        gestionParqueaderos("ABC123");
+        gestionParqueaderos("DEF456");
+        gestionParqueaderos("ABC123");
         return root;
     }
 
@@ -68,6 +87,7 @@ public class BluetoothFragment extends Fragment {
                         @Override
                         public void run() {
                             textView.setText("Conectado al dispositivo Bluetooth.");
+                            textView.setVisibility(View.GONE);
                         }
                     });
 
@@ -77,6 +97,7 @@ public class BluetoothFragment extends Fragment {
                         @Override
                         public void run() {
                             textView.setText("Error al conectar: " + e.getMessage());
+                            textView.setVisibility(View.VISIBLE);
                         }
                     });
                 }
@@ -90,8 +111,8 @@ public class BluetoothFragment extends Fragment {
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        // Muestra los datos recibidos en el TextView
-                        textView.append("\n" + data);
+                        gestionParqueaderos(data);
+
                     }
                 });
             }
@@ -134,4 +155,79 @@ public class BluetoothFragment extends Fragment {
             bluetooth.closeConnection();
         }
     }
+
+    private void updateVehicleDisplay() {
+        // Limpia el contenedor
+        vehicleContainer.removeAllViews();
+        if(!vehiculos.isEmpty()) {
+            for (Vehiculo vehiculo : vehiculos) {
+                // Crear cuadro para cada vehículo
+                TextView vehicleView = new TextView(getContext());
+                vehicleView.setText("ID: " + vehiculo.getUid() +"\nPlaca: " + vehiculo.getPlaca() + "\nEntrada: " + vehiculo.getHoraEntrada());
+                vehicleView.setPadding(16, 16, 16, 16);
+                vehicleView.setBackgroundColor(Color.parseColor("#DDDDDD"));
+                vehicleView.setTextColor(Color.BLACK);
+                vehicleView.setGravity(Gravity.CENTER_VERTICAL);
+                vehicleView.setTextSize(16);
+
+                // Margen
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                );
+                params.setMargins(0, 16, 0, 16);
+                vehicleView.setLayoutParams(params);
+
+                vehicleContainer.addView(vehicleView);
+            }
+        }
+    }
+
+    public void gestionParqueaderos(String data){
+        // Gestión de los datos recibidos
+        Vehiculo vehiculoSaliente = null;
+
+        if(!vehiculos.isEmpty()){
+            for(int i=0; i<vehiculos.size() ; i++){
+                if(vehiculos.get(i).getUid().equals(data)){
+                    vehiculos.get(i).setHoraSalida(new Date());
+                    vehiculoSaliente = vehiculos.get(i);
+                    break;
+                }
+            }
+        }
+        if(vehiculoSaliente == null){
+            if(vehiculos.size()<=8) {
+                Vehiculo v = new Vehiculo("nnn000", data);
+                vehiculos.add(v);
+            }
+        } else {
+            // Mostrar notificación de salida
+            mostrarNotificacionSalida(vehiculoSaliente);
+        }
+        updateVehicleDisplay();
+    }
+
+    private void mostrarNotificacionSalida(Vehiculo vehiculo) {
+        // Calcular la duración de la estadía
+        Date horaEntrada = vehiculo.getHoraEntrada();
+        Date horaSalida = vehiculo.getHoraSalida();
+        long duracion = vehiculo.calcularTiempoEnParqueadero();
+        long minutos = (duracion / (1000 * 60)) % 60;
+        long horas = (duracion / (1000 * 60 * 60));
+
+        // Formatear el mensaje
+        String mensaje = "Placa: " + vehiculo.getPlaca() + "\n" +
+                "Hora de entrada: " + horaEntrada + "\n" +
+                "Hora de salida: " + horaSalida + "\n" +
+                "Duración: " + horas + " horas y " + minutos + " minutos.";
+
+        // Crear y mostrar el cuadro de diálogo
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Vehículo salió del parqueadero")
+                .setMessage(mensaje)
+                .setPositiveButton("OK", null)
+                .show();
+    }
+
 }
