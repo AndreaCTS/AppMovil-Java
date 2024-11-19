@@ -50,4 +50,13 @@ public class Vehiculo {
         return horaSalida.getTime() - horaEntrada.getTime();
     }
 
+    @Override
+    public String toString() {
+        return "Vehiculo{" +
+                "placa='" + placa + '\'' +
+                ", uid='" + uid + '\'' +
+                ", horaEntrada=" + horaEntrada +
+                ", horaSalida=" + horaSalida +
+                '}';
+    }
 }

@@ -45,7 +45,7 @@ public class BluetoothFragment extends Fragment {
         textView = binding.textHome; // Asumiendo que tienes un TextView en tu layout con id textHome
         this.vehiculos = new ArrayList<>();
         // Inicialización del Bluetooth
-        bluetooth = new Bluetooth("S22 Ultra de Laura");  // Cambia el nombre del dispositivo Bluetooth si es necesario
+        bluetooth = new Bluetooth("ESP32-Parqueadero");  // Cambia el nombre del dispositivo Bluetooth si es necesario
 
         // Verificar si Bluetooth está disponible y habilitado
         if (!bluetooth.isBluetoothAvailable()) {
@@ -71,9 +71,6 @@ public class BluetoothFragment extends Fragment {
 
         vehicleContainer = root.findViewById(R.id.vehicle_container);
         // Simulación de Bluetooth OnDataReceivedListener
-        gestionParqueaderos("ABC123");
-        gestionParqueaderos("DEF456");
-        gestionParqueaderos("ABC123");
         return root;
     }
 
@@ -184,6 +181,7 @@ public class BluetoothFragment extends Fragment {
     }
 
     public void gestionParqueaderos(String data){
+        data = data.trim();
         // Gestión de los datos recibidos
         Vehiculo vehiculoSaliente = null;
 
@@ -192,18 +190,23 @@ public class BluetoothFragment extends Fragment {
                 if(vehiculos.get(i).getUid().equals(data)){
                     vehiculos.get(i).setHoraSalida(new Date());
                     vehiculoSaliente = vehiculos.get(i);
+                    vehiculos.remove(i);
                     break;
                 }
             }
         }
         if(vehiculoSaliente == null){
-            if(vehiculos.size()<=8) {
+            boolean condicion = (data == null || data.trim().isEmpty());
+
+            if(vehiculos.size()<=8 && !condicion) {
+                System.out.println(data);
                 Vehiculo v = new Vehiculo("nnn000", data);
                 vehiculos.add(v);
             }
         } else {
             // Mostrar notificación de salida
             mostrarNotificacionSalida(vehiculoSaliente);
+
         }
         updateVehicleDisplay();
     }

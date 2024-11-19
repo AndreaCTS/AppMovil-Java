@@ -1,0 +1,57 @@
+Index: app/src/main/java/com/example/appmovil/ui/bluetooth/BluetoothFragment.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.appmovil.ui.bluetooth;\r\n\r\nimport android.Manifest;\r\nimport android.content.pm.PackageManager;\r\nimport android.os.Build;\r\nimport android.os.Bundle;\r\nimport android.view.LayoutInflater;\r\nimport android.view.View;\r\nimport android.view.ViewGroup;\r\nimport android.widget.TextView;\r\nimport android.widget.Toast;\r\n\r\nimport androidx.annotation.NonNull;\r\nimport androidx.core.app.ActivityCompat;\r\nimport androidx.fragment.app.Fragment;\r\n\r\nimport com.example.appmovil.databinding.FragmentHomeBinding;\r\n\r\npublic class BluetoothFragment extends Fragment {\r\n\r\n    private static final int REQUEST_BLUETOOTH_PERMISSIONS = 1;\r\n    private FragmentHomeBinding binding;\r\n    private Bluetooth bluetooth; // Instancia de la clase Bluetooth\r\n    private TextView textView; // TextView para mostrar los datos recibidos\r\n\r\n    @Override\r\n    public View onCreateView(@NonNull LayoutInflater inflater,\r\n                             ViewGroup container, Bundle savedInstanceState) {\r\n        binding = FragmentHomeBinding.inflate(inflater, container, false);\r\n        View root = binding.getRoot();\r\n\r\n        // Inicializar el TextView para mostrar los datos\r\n        textView = binding.textHome; // Asumiendo que tienes un TextView en tu layout con id textHome\r\n\r\n        // Inicialización del Bluetooth\r\n        bluetooth = new Bluetooth(\"ESP32_Parqueadero\");  // Cambia el nombre del dispositivo Bluetooth si es necesario\r\n\r\n        // Verificar si Bluetooth está disponible y habilitado\r\n        if (!bluetooth.isBluetoothAvailable()) {\r\n            textView.setText(\"Bluetooth no está disponible en este dispositivo.\");\r\n        } else if (!bluetooth.isBluetoothEnabled()) {\r\n            textView.setText(\"Por favor, habilita Bluetooth.\");\r\n        } else {\r\n            // Verificar permisos y solicitar si es necesario\r\n            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {\r\n                if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {\r\n                    requestPermissions(new String[]{Manifest.permission.BLUETOOTH_CONNECT}, REQUEST_BLUETOOTH_PERMISSIONS);\r\n                } else {\r\n                    // Si ya tenemos permisos, intentar la conexión\r\n                    connectToBluetooth();\r\n                }\r\n            } else {\r\n                // En versiones anteriores a Android 12, no es necesario solicitar permisos específicos de Bluetooth\r\n                connectToBluetooth();\r\n            }\r\n        }\r\n\r\n        return root;\r\n    }\r\n\r\n    private void connectToBluetooth() {\r\n        new Thread(new Runnable() {\r\n            @Override\r\n            public void run() {\r\n                try {\r\n                    bluetooth.connect(); // Intentamos conectar\r\n                    getActivity().runOnUiThread(new Runnable() {\r\n                        @Override\r\n                        public void run() {\r\n                            textView.setText(\"Conectado al dispositivo Bluetooth.\");\r\n                        }\r\n                    });\r\n\r\n                    bluetooth.startListening(); // Empezamos a escuchar los datos enviados por el ESP32\r\n                } catch (Exception e) {\r\n                    getActivity().runOnUiThread(new Runnable() {\r\n                        @Override\r\n                        public void run() {\r\n                            textView.setText(\"Error al conectar: \" + e.getMessage());\r\n                        }\r\n                    });\r\n                }\r\n            }\r\n        }).start();\r\n\r\n        // Configuración para recibir datos de Bluetooth\r\n        bluetooth.setOnDataReceivedListener(new Bluetooth.OnDataReceivedListener() {\r\n            @Override\r\n            public void onDataReceived(String data) {\r\n                getActivity().runOnUiThread(new Runnable() {\r\n                    @Override\r\n                    public void run() {\r\n                        // Muestra los datos recibidos en el TextView\r\n                        textView.append(\"\\n\" + data);\r\n                    }\r\n                });\r\n            }\r\n\r\n            @Override\r\n            public void onError(String error) {\r\n                getActivity().runOnUiThread(new Runnable() {\r\n                    @Override\r\n                    public void run() {\r\n                        // Si ocurre un error, lo mostramos en un Toast\r\n                        Toast.makeText(getContext(), \"Error: \" + error, Toast.LENGTH_SHORT).show();\r\n                    }\r\n                });\r\n            }\r\n        });\r\n    }\r\n\r\n    @Override\r\n    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {\r\n        super.onRequestPermissionsResult(requestCode, permissions, grantResults);\r\n\r\n        if (requestCode == REQUEST_BLUETOOTH_PERMISSIONS) {\r\n            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {\r\n                // Permiso concedido, intentamos la conexión\r\n                connectToBluetooth();\r\n            } else {\r\n                // Permiso denegado, muestra un mensaje de advertencia\r\n                Toast.makeText(getContext(), \"Permiso denegado. No se puede acceder al Bluetooth.\", Toast.LENGTH_SHORT).show();\r\n            }\r\n        }\r\n    }\r\n\r\n    @Override\r\n    public void onDestroyView() {\r\n        super.onDestroyView();\r\n        binding = null;\r\n\r\n        // Cerrar la conexión Bluetooth al destruir el fragmento\r\n        if (bluetooth != null) {\r\n            bluetooth.closeConnection();\r\n        }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/appmovil/ui/bluetooth/BluetoothFragment.java b/app/src/main/java/com/example/appmovil/ui/bluetooth/BluetoothFragment.java
+--- a/app/src/main/java/com/example/appmovil/ui/bluetooth/BluetoothFragment.java	(revision d6c7589b1ebde74d274ba2e4591d3da87d33b8e2)
++++ b/app/src/main/java/com/example/appmovil/ui/bluetooth/BluetoothFragment.java	(date 1731978103457)
+@@ -33,7 +33,7 @@
+         textView = binding.textHome; // Asumiendo que tienes un TextView en tu layout con id textHome
+ 
+         // Inicialización del Bluetooth
+-        bluetooth = new Bluetooth("ESP32_Parqueadero");  // Cambia el nombre del dispositivo Bluetooth si es necesario
++        bluetooth = new Bluetooth("ESP32-Parqueadero");  // Cambia el nombre del dispositivo Bluetooth si es necesario
+ 
+         // Verificar si Bluetooth está disponible y habilitado
+         if (!bluetooth.isBluetoothAvailable()) {
+Index: .idea/deploymentTargetSelector.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/deploymentTargetSelector.xml b/.idea/deploymentTargetSelector.xml
+deleted file mode 100644
+--- a/.idea/deploymentTargetSelector.xml	(revision d6c7589b1ebde74d274ba2e4591d3da87d33b8e2)
++++ /dev/null	(revision d6c7589b1ebde74d274ba2e4591d3da87d33b8e2)
+@@ -1,10 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project version="4">
+-  <component name="deploymentTargetSelector">
+-    <selectionStates>
+-      <SelectionState runConfigName="AppMovil.app">
+-        <option name="selectionMode" value="DROPDOWN" />
+-      </SelectionState>
+-    </selectionStates>
+-  </component>
+-</project>
+\ No newline at end of file
+Index: .idea/gradle.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"GradleSettings\">\r\n    <option name=\"linkedExternalProjectsSettings\">\r\n      <GradleProjectSettings>\r\n        <option name=\"testRunner\" value=\"CHOOSE_PER_TEST\" />\r\n        <option name=\"externalProjectPath\" value=\"$PROJECT_DIR$\" />\r\n        <option name=\"gradleJvm\" value=\"#GRADLE_LOCAL_JAVA_HOME\" />\r\n        <option name=\"modules\">\r\n          <set>\r\n            <option value=\"$PROJECT_DIR$\" />\r\n            <option value=\"$PROJECT_DIR$/app\" />\r\n          </set>\r\n        </option>\r\n        <option name=\"resolveExternalAnnotations\" value=\"false\" />\r\n      </GradleProjectSettings>\r\n    </option>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/gradle.xml b/.idea/gradle.xml
+--- a/.idea/gradle.xml	(revision d6c7589b1ebde74d274ba2e4591d3da87d33b8e2)
++++ b/.idea/gradle.xml	(date 1731977999020)
+@@ -1,5 +1,6 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
++  <component name="GradleMigrationSettings" migrationVersion="1" />
+   <component name="GradleSettings">
+     <option name="linkedExternalProjectsSettings">
+       <GradleProjectSettings>
