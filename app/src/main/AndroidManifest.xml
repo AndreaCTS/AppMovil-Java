@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <!-- Permiso para ubicación en Android 10+ (necesario para escaneo de dispositivos Bluetooth cercanos) -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 

@@ -18,7 +18,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.appmovil.R;
-import com.example.appmovil.databinding.FragmentHomeBinding;
+import com.example.appmovil.databinding.FragmentRfidBinding;
 import com.example.appmovil.ui.carros.Vehiculo;
 
 import java.time.Instant;
@@ -28,7 +28,7 @@ import java.util.Date;
 public class BluetoothFragment extends Fragment {
 
     private static final int REQUEST_BLUETOOTH_PERMISSIONS = 1;
-    private FragmentHomeBinding binding;
+    private FragmentRfidBinding binding;
     private Bluetooth bluetooth; // Instancia de la clase Bluetooth
     private TextView textView; // TextView para mostrar los datos recibidos
 
@@ -38,7 +38,7 @@ public class BluetoothFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        binding = FragmentHomeBinding.inflate(inflater, container, false);
+        binding = FragmentRfidBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         // Inicializar el TextView para mostrar los datos
