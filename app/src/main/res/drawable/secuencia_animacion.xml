@@ -2,19 +2,16 @@
 <animation-list xmlns:android="http://schemas.android.com/apk/res/android"
     android:oneshot="false">
 
-    <!-->
-    <item android:drawable="@drawable/fot2" android:duration="130" />
-    <item android:drawable="@drawable/fot3" android:duration="130" />
-    <item android:drawable="@drawable/fot5" android:duration="130" />
-    <item android:drawable="@drawable/fot7" android:duration="130" />
-    <item android:drawable="@drawable/fot9" android:duration="130" />
-    <item android:drawable="@drawable/fot11" android:duration="130" />
-    <item android:drawable="@drawable/fot12" android:duration="130" />
-    <item android:drawable="@drawable/fot14" android:duration="130" />
-    <item android:drawable="@drawable/fot16" android:duration="130" />
-    <item android:drawable="@drawable/fot18" android:duration="130" />
-    <item android:drawable="@drawable/fot20" android:duration="130" />
-    <item android:drawable="@drawable/fot21" android:duration="900" />
-    <!-->
+    <item android:drawable="@drawable/i2" android:duration="130" />
+    <item android:drawable="@drawable/i3" android:duration="130" />
+    <item android:drawable="@drawable/i5" android:duration="130" />
+    <item android:drawable="@drawable/i7" android:duration="130" />
+    <item android:drawable="@drawable/i9" android:duration="130" />
+    <item android:drawable="@drawable/i11" android:duration="130" />
+    <item android:drawable="@drawable/i12" android:duration="130" />
+    <item android:drawable="@drawable/i14" android:duration="130" />
+    <item android:drawable="@drawable/i16" android:duration="130" />
+    <item android:drawable="@drawable/i18" android:duration="130" />
+    <item android:drawable="@drawable/i19" android:duration="130" />
 
 </animation-list>
