@@ -1,6 +1,7 @@
 package com.example.appmovil.ui.parking;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,9 @@ public class ParkingFragment extends Fragment {
     private FragmentParkingBinding binding;
     private ParkingMap parkingMap;
     private WifiHandler wifiHandler;
+    private Handler handler;
+    private Runnable refreshTask;
+    private static final int REFRESH_INTERVAL = 1000;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -33,21 +37,40 @@ public class ParkingFragment extends Fragment {
         parkingMap = new ParkingMap(parkingSpots);
 
         // Configura el Wi-Fi para recibir datos
-        wifiHandler = new WifiHandler("192.168.0.10"); // Cambia esta IP
-        wifiHandler.fetchData(data -> {
-            requireActivity().runOnUiThread(() -> {
-                String parkingData = DataManager.getInstance().getParkingData();
-                parkingMap.updateMap(parkingData);
-            });
-        });
+        wifiHandler = new WifiHandler("192.168.4.1/parkingData"); // Cambia esta IP
+        // Configura la tarea de actualización periódica
+        handler = new Handler();
+        refreshTask = new Runnable() {
+            @Override
+            public void run() {
+                fetchDataFromServer();
+                handler.postDelayed(this, REFRESH_INTERVAL);
+            }
+        };
+        handler.post(refreshTask); // Inicia la tarea periódica
 
 
         return root;
     }
 
+    private void fetchDataFromServer() {
+        wifiHandler.fetchData(data -> {
+            if (isAdded() && getActivity() != null) {
+                getActivity().runOnUiThread(() -> {
+                    String parkingData = DataManager.getInstance().getParkingData();
+                    parkingMap.updateMap(parkingData);
+                });
+            }
+        });
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        // Detén el handler para evitar fugas de memoria
+        if (handler != null && refreshTask != null) {
+            handler.removeCallbacks(refreshTask);
+        }
         binding = null;
     }
 }

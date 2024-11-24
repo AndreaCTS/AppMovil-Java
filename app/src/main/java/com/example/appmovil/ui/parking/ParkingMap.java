@@ -20,6 +20,8 @@ public class ParkingMap {
         if (data != null && data.length() == parkingSpots.length) {
             for (int i = 0; i < data.length(); i++) {
                 if (data.charAt(i) == '1') {
+                    parkingSpots[i].setImageResource(R.drawable.espacio_ocupado_1);
+                    /*
                     int randomIndex = random.nextInt(3);
                     switch (randomIndex) {
                         case 0:
@@ -32,6 +34,7 @@ public class ParkingMap {
                             parkingSpots[i].setImageResource(R.drawable.espacio_ocupado_3);
                             break;
                     }
+                     */
 
                 } else {
                     parkingSpots[i].setImageResource(R.drawable.espacio_desocupado);

@@ -2,6 +2,7 @@ package com.example.appmovil.ui.rfid;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,10 +23,13 @@ import java.util.Date;
 
 public class RfidFragment extends Fragment {
 
+    private static final int REFRESH_INTERVAL = 500; // Intervalo en milisegundos (5 segundos)
+    private Handler handler;
+    private Runnable refreshTask;
     private FragmentRfidBinding binding;
     private WifiHandler wifiHandler; // Instancia para manejar conexión Wi-Fi
     private TextView textView; // TextView para mostrar mensajes
-    private ArrayList<Vehiculo> vehiculos; // Lista de vehículos en el parqueadero
+    private ArrayList<Vehiculo> vehiculos= new ArrayList<>(); // Lista de vehículos en el parqueadero
     private LinearLayout vehicleContainer; // Contenedor para mostrar vehículos en pantalla
 
     @Override
@@ -35,14 +39,22 @@ public class RfidFragment extends Fragment {
         View root = binding.getRoot();
 
         textView = binding.textHome;
-        this.vehiculos = new ArrayList<>();
+
         vehicleContainer = root.findViewById(R.id.vehicle_container);
 
         // Inicializar WifiHandler con la URL del servidor
-        wifiHandler = new WifiHandler("192.168.0.10"); // Cambiar por la IP/puerto del servidor
+        wifiHandler = new WifiHandler("192.168.4.1/latestUID"); // Cambiar por la IP/puerto del servidor
 
-        // Iniciar la escucha de datos
-        fetchDataFromServer();
+        // Configura el handler para actualizar datos periódicamente
+        handler = new Handler();
+        refreshTask = new Runnable() {
+            @Override
+            public void run() {
+                fetchDataFromServer();
+                handler.postDelayed(this, REFRESH_INTERVAL);
+            }
+        };
+        handler.post(refreshTask);
 
         return root;
     }
@@ -85,7 +97,10 @@ public class RfidFragment extends Fragment {
     }
 
     public void gestionParqueaderos(String data) {
+        System.out.println("uids guardados sin agregar: "+vehiculos.toString());
+        if(data != null){
         data = data.trim();
+        }
         Vehiculo vehiculoSaliente = null;
 
         if (!vehiculos.isEmpty()) {
@@ -105,6 +120,7 @@ public class RfidFragment extends Fragment {
             if (vehiculos.size() <= 8 && !condicion) {
                 Vehiculo v = new Vehiculo("nnn000", data);
                 vehiculos.add(v);
+                System.out.println("uids agregado: "+vehiculos.toString());
             }
         } else {
             mostrarNotificacionSalida(vehiculoSaliente);
@@ -134,6 +150,10 @@ public class RfidFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        // Detén el handler cuando la vista se destruya
+        if (handler != null && refreshTask != null) {
+            handler.removeCallbacks(refreshTask);
+        }
         binding = null;
     }
 }

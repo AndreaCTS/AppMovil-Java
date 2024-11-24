@@ -19,11 +19,7 @@ public class WifiHandler {
     }
 
     public void fetchData(OnDataReceivedListener listener) {
-        //new FetchDataTask(listener).execute();
-
-        String mockData = "RFID:11111;PARKING:01010101";
-        DataManager.getInstance().processData(mockData);
-        listener.onDataReceived(mockData);
+        new FetchDataTask(listener).execute();
     }
 
     public interface OnDataReceivedListener {
@@ -63,8 +59,15 @@ public class WifiHandler {
 
         @Override
         protected void onPostExecute(String data) {
-            if (listener != null) {
+            if (data != null && listener != null) {
+                // Procesa los datos obtenidos
+                DataManager.getInstance().processData(data);
+
+                // Notifica al listener
                 listener.onDataReceived(data);
+            } else if (listener != null) {
+                // Notifica al listener que no se obtuvieron datos
+                listener.onDataReceived("No se pudo obtener datos del servidor.");
             }
         }
     }
