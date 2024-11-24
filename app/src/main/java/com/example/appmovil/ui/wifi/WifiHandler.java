@@ -3,6 +3,8 @@ package com.example.appmovil.ui.wifi;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.example.appmovil.ui.rfid.DataManager;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -19,7 +21,8 @@ public class WifiHandler {
     public void fetchData(OnDataReceivedListener listener) {
         //new FetchDataTask(listener).execute();
 
-        String mockData = "10010001";
+        String mockData = "RFID:11111;PARKING:01010101";
+        DataManager.getInstance().processData(mockData);
         listener.onDataReceived(mockData);
     }
 

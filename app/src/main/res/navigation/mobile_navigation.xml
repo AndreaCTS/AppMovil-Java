@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="com.example.appmovil.ui.bluetooth.BluetoothFragment"
+        android:name="com.example.appmovil.ui.rfid.RfidFragment"
         android:label="@string/menu_entradas"
         tools:layout="@layout/fragment_rfid" />
 

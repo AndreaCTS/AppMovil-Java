@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.appmovil.databinding.FragmentParkingBinding;
+import com.example.appmovil.ui.rfid.DataManager;
 import com.example.appmovil.ui.wifi.WifiHandler;
 
 public class ParkingFragment extends Fragment {
@@ -34,9 +35,12 @@ public class ParkingFragment extends Fragment {
         // Configura el Wi-Fi para recibir datos
         wifiHandler = new WifiHandler("192.168.0.10"); // Cambia esta IP
         wifiHandler.fetchData(data -> {
-            // Actualiza el mapa de parqueaderos en el hilo principal
-            requireActivity().runOnUiThread(() -> parkingMap.updateMap(data));
+            requireActivity().runOnUiThread(() -> {
+                String parkingData = DataManager.getInstance().getParkingData();
+                parkingMap.updateMap(parkingData);
+            });
         });
+
 
         return root;
     }
