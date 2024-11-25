@@ -1,6 +1,7 @@
 package com.example.appmovil;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 
@@ -16,6 +17,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.appmovil.databinding.ActivityMainBinding;
 
+import org.opencv.android.OpenCVLoader;
+
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
@@ -27,6 +30,9 @@ public class MainActivity extends AppCompatActivity {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        if(OpenCVLoader.initDebug()) Log.d("OPEN2023CV", "SUCESS");
+        else Log.d("OPEN2023CV", "ERROR");
 
         setSupportActionBar(binding.appBarMain.toolbar);
         binding.appBarMain.fab.setOnClickListener(new View.OnClickListener() {
