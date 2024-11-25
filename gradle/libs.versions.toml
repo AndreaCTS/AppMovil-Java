@@ -24,6 +24,8 @@ lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-view
 navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment", version.ref = "navigationFragment" }
 navigation-ui = { group = "androidx.navigation", name = "navigation-ui", version.ref = "navigationUi" }
 #opencv = { module = "org.opencv:opencv-android", version.ref = "opencv" }
+tesseract = { group = "com.googlecode.tesseract.android", name = "tesseract-android", version = "5.0.0" }
+tesstwo = { group = "com.rmtheis", name = "tess-two", version = "9.1.0" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

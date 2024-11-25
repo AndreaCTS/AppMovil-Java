@@ -36,6 +36,8 @@ android {
 
 dependencies {
 
+    //implementation(libs.tesseract)
+    implementation(libs.tesstwo)
     //implementation(libs.opencv)
     implementation(libs.appcompat)
     implementation(libs.material)
