@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.slideshow.SlideshowFragment">
 
-    <!-- Otro contenido del fragmento -->
+    <!-- Texto descriptivo -->
     <TextView
         android:id="@+id/textSlideshow"
         android:layout_width="wrap_content"
@@ -14,18 +15,30 @@
         android:text="Slideshow Fragment"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="16dp" />
 
-    <!-- Aquí agregamos el ImageView para mostrar la imagen de la cámara -->
+    <!-- ImageView para mostrar la imagen completa procesada -->
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="0dp"
         android:layout_height="300dp"
-        android:contentDescription="Cámara"
+        android:contentDescription="Imagen procesada"
         android:scaleType="fitCenter"
         app:layout_constraintTop_toBottomOf="@+id/textSlideshow"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="16dp" />
+
+    <!-- ImageView para mostrar el recorte de la placa -->
+    <ImageView
+        android:id="@+id/plateImageView"
+        android:layout_width="0dp"
+        android:layout_height="200dp"
+        android:contentDescription="Imagen de la placa"
+        android:scaleType="fitCenter"
+        app:layout_constraintTop_toBottomOf="@+id/imageView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
