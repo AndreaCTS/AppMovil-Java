@@ -36,7 +36,9 @@ android {
 
 dependencies {
 
-    //implementation(libs.tesseract)
+    implementation(libs.retro2)
+    implementation(libs.retrofit)
+    implementation(libs.okh)
     implementation(libs.tesstwo)
     //implementation(libs.opencv)
     implementation(libs.appcompat)

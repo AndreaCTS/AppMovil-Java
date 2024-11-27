@@ -11,6 +11,7 @@ lifecycleViewmodelKtx = "2.8.7"
 navigationFragment = "2.8.4"
 navigationUi = "2.8.4"
 #opencv = "4.5.3"
+retro = "2.9.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -26,6 +27,9 @@ navigation-ui = { group = "androidx.navigation", name = "navigation-ui", version
 #opencv = { module = "org.opencv:opencv-android", version.ref = "opencv" }
 tesseract = { group = "com.googlecode.tesseract.android", name = "tesseract-android", version = "5.0.0" }
 tesstwo = { group = "com.rmtheis", name = "tess-two", version = "9.1.0" }
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retro"}
+retro2 = { group = "com.squareup.retrofit2", name = "converter-gson", version= "2.9.0"}
+okh = { group = "com.squareup.okhttp3", name = "okhttp", version= "4.9.0"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

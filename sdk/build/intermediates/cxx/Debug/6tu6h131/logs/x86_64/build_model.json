@@ -154,7 +154,7 @@
         "rootBuildGradleFolder": "C:\\Users\\Laura\\AndroidStudioProjects\\AppMovil-Java",
         "sdkFolder": "C:\\Users\\Laura\\AppData\\Local\\Android\\Sdk",
         "isBuildOnlyTargetAbiEnabled": true,
-        "ideBuildTargetAbi": "x86_64,arm64-v8a",
+        "ideBuildTargetAbi": "x86_64",
         "isCmakeBuildCohabitationEnabled": false,
         "isPrefabEnabled": false
       },

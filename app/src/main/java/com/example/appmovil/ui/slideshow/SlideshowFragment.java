@@ -17,6 +17,7 @@ import com.googlecode.tesseract.android.TessBaseAPI;
 
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Rect;
@@ -41,7 +42,7 @@ public class SlideshowFragment extends Fragment {
     private ImageView imageView;
     private TessBaseAPI tessBaseAPI;
 
-    private static final String ESP32_URL = "https://drive.google.com/uc?export=view&id=188k1ooINJm4fuTutsIc22JxSW_L6sEWy";
+    private static final String ESP32_URL = "https://drive.google.com/uc?export=view&id=1fQU4P8dL9W29JfdGM3WVUk2-qRg89zBn";
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -135,6 +136,7 @@ public class SlideshowFragment extends Fragment {
         }
         return bitmap;
     }
+
     private Bitmap[] processImage(Bitmap bitmap) {
         try {
             Mat mat = new Mat();
@@ -148,9 +150,9 @@ public class SlideshowFragment extends Fragment {
             Mat hsvMat = new Mat();
             Imgproc.cvtColor(mat, hsvMat, Imgproc.COLOR_RGB2HSV);
 
-            // Definir un rango de amarillo que corresponde a las placas
-            Scalar lowerYellow = new Scalar(15, 120, 100);
-            Scalar upperYellow = new Scalar(45, 255, 255);
+            // Definir un rango de amarillo para las placas
+            Scalar lowerYellow = new Scalar(25, 100, 100);
+            Scalar upperYellow = new Scalar(30, 255, 255);
 
             Mat yellowMask = new Mat();
             Core.inRange(hsvMat, lowerYellow, upperYellow, yellowMask);
@@ -163,73 +165,86 @@ public class SlideshowFragment extends Fragment {
             Bitmap plateBitmap = null;
             String recognizedText = "";
 
-            // Filtrar los contornos para encontrar los más relevantes
+            // Filtrar los contornos para encontrar los más relevantes (placa)
             for (MatOfPoint contour : contours) {
                 Rect boundingRect = Imgproc.boundingRect(contour);
                 double aspectRatio = (double) boundingRect.width / boundingRect.height;
-                // Filtrar placas por tamaño y aspecto
                 if (aspectRatio > 1 && aspectRatio < 5 && boundingRect.area() > 1000) {
+                    // Extraer la región de la placa
                     Mat plateRegion = new Mat(mat, boundingRect);
+
+                    //plateBitmap = Bitmap.createBitmap(plateRegion.cols(), plateRegion.rows(), Bitmap.Config.ARGB_8888);
+                    //Utils.matToBitmap(plateRegion, plateBitmap);
+
+                    // Calcular padding dinámico basado en las dimensiones del rectángulo
+                    int paddingX = (int) (boundingRect.width * 0.05); // 10% del ancho
+                    int paddingY = (int) (boundingRect.height * 0.1); // 10% de la altura
+
+                    // Ajustar los límites para evitar recortar fuera de la imagen
+                    int x = Math.max(boundingRect.x + paddingX, 0);
+                    int y = Math.max(boundingRect.y + paddingY, 0);
+                    int width = Math.min(boundingRect.width - 2 * paddingX, mat.cols() - x);
+                    int height = Math.min(boundingRect.height - 2 * paddingY, mat.rows() - y);
+
+                    if (width <= 0 || height <= 0) continue; // Ignorar si el recorte no es válido
+
+                    Rect croppedRect = new Rect(x, y, width, height);
+                    Mat croppedPlateRegion = new Mat(mat, croppedRect);
 
                     // Convertir a escala de grises
                     Mat gray = new Mat();
-                    Imgproc.cvtColor(plateRegion, gray, Imgproc.COLOR_RGB2GRAY);
+                    Imgproc.cvtColor(croppedPlateRegion, gray, Imgproc.COLOR_RGB2GRAY);
 
-                    // Ecualizar el histograma
+                    // Mejorar el contraste y la visibilidad de las letras
                     Imgproc.equalizeHist(gray, gray);
 
-                    // Aumentar el contraste utilizando CLAHE
+                    // Aumentar el contraste usando CLAHE
                     Mat enhanced = new Mat();
                     Imgproc.createCLAHE(2.0, new org.opencv.core.Size(8, 8)).apply(gray, enhanced);
 
-                    // Aplicar un filtro MedianBlur para eliminar bordes y detalles innecesarios
-                    Mat blurred = new Mat();
-                    Imgproc.medianBlur(enhanced, blurred, 5);  // Usar MedianBlur para suprimir bordes
-
-                    // Realizar umbral adaptativo para binarización
                     Mat binary = new Mat();
-                    Imgproc.adaptiveThreshold(blurred, binary, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C,
-                            Imgproc.THRESH_BINARY, 11, 2);
+                    Imgproc.threshold(enhanced, binary, 0, 255, Imgproc.THRESH_BINARY + Imgproc.THRESH_OTSU);
+                    //Mat binary = new Mat();
+                    //Imgproc.adaptiveThreshold(gray, binary, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, 11, 2);
 
-                    // Aplicar un cierre morfológico para eliminar pequeños puntos de ruido
-                    Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new org.opencv.core.Size(7, 7));
-                    Imgproc.morphologyEx(binary, binary, Imgproc.MORPH_CLOSE, kernel);
+                    // Crear una máscara para las áreas negras puras (por debajo del umbral)
+                    Mat mask = new Mat();
+                    Core.inRange(enhanced, new Scalar(0), new Scalar(50), mask); // Áreas negras puras (ajustar el umbral según necesites)
 
-                    // Aplicar erosión y dilatación para eliminar bordes y mejorar la placa
-                    Mat eroded = new Mat();
-                    Imgproc.erode(binary, eroded, kernel);  // Erosión para reducir el borde
+                    Mat inverseMask = new Mat();
+                    Core.bitwise_not(mask, inverseMask); // Invertir la máscara
 
-                    Mat dilated = new Mat();
-                    Imgproc.dilate(eroded, dilated, kernel);  // Dilatación para recuperar la forma de la placa
+                    // Asignar las áreas no negras a blanco
+                    Mat result = new Mat(enhanced.size(), CvType.CV_8UC1, new Scalar(0)); // Crear una imagen negra
+                    result.setTo(new Scalar(255), inverseMask); // Asignar blanco a las áreas no negras
 
-                    // Convertir el resultado a Bitmap
-                    plateBitmap = Bitmap.createBitmap(dilated.cols(), dilated.rows(), Bitmap.Config.ARGB_8888);
-                    Utils.matToBitmap(dilated, plateBitmap);
+                    // Convertir a Bitmap para mostrar o guardar
+                    plateBitmap = Bitmap.createBitmap(result.cols(), result.rows(), Bitmap.Config.ARGB_8888);
+                    Utils.matToBitmap(result, plateBitmap);
 
-                    // Reconocer texto
-                    tessBaseAPI.setPageSegMode(TessBaseAPI.PageSegMode.PSM_SINGLE_BLOCK);
+                    // Reconocer texto en la imagen de la placa
+                    //tessBaseAPI.setPageSegMode(TessBaseAPI.PageSegMode.PSM_SINGLE_BLOCK);
+                    // Reconocer texto en la imagen de la placa
+                    //tessBaseAPI.setPageSegMode(TessBaseAPI.PageSegMode.PSM_SINGLE_LINE); // Modo de OCR para una sola línea
                     tessBaseAPI.setImage(plateBitmap);
-                    recognizedText = tessBaseAPI.getUTF8Text();
+                    recognizedText = tessBaseAPI.getUTF8Text().replaceAll("[^A-Z0-9]", ""); // Filtrar solo caracteres válidos
                     Log.d("Tesseract", "Texto reconocido: " + recognizedText);
 
                     break; // Solo procesar la primera placa detectada
                 }
             }
 
+            // Convertir la imagen completa a Bitmap (sin ningún borde o rectángulo marcado)
             Bitmap processedBitmap = Bitmap.createBitmap(mat.cols(), mat.rows(), Bitmap.Config.ARGB_8888);
             Utils.matToBitmap(mat, processedBitmap);
 
             Log.d("ProcessImage", "Texto final reconocido: " + recognizedText);
 
-            return new Bitmap[]{processedBitmap, plateBitmap}; // Devuelve ambas imágenes
+            return new Bitmap[]{processedBitmap, plateBitmap}; // Devuelve ambas imágenes: la completa y la de la placa
         } catch (Exception e) {
             Log.e("ProcessImage", "Error procesando la imagen: " + e.getMessage(), e);
             return null;
         }
     }
-
-
-
-
 
 }
