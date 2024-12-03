@@ -1,5 +1,6 @@
 package com.example.appmovil.ui.slideshow;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,6 +21,8 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.appmovil.R;
 import com.example.appmovil.databinding.FragmentSlideshowBinding;
+import com.example.appmovil.ui.rfid.RfidFragment;
+import com.example.appmovil.ui.vista.ShareViewModel;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.Text;
@@ -64,6 +67,9 @@ public class SlideshowFragment extends Fragment {
     private ImageCapture imageCapture;
     private TessBaseAPI tessBaseAPI;
 
+    private ShareViewModel sharedViewModel;
+
+
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
 
     @Override
@@ -75,6 +81,8 @@ public class SlideshowFragment extends Fragment {
         cameraPreviewView = root.findViewById(R.id.camera_preview);
         plateImageView = root.findViewById(R.id.plate_image_view);
         recognizedTextView = root.findViewById(R.id.text_recognized);
+
+        sharedViewModel = new ViewModelProvider(requireActivity()).get(ShareViewModel.class);
 
         // Iniciar la cámara
         cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext());
@@ -263,7 +271,11 @@ public class SlideshowFragment extends Fragment {
             textRecognizer.process(image)
                     .addOnSuccessListener(text -> {
                         // Manejar el texto reconocido
-                        recognizedTextView.setText(text.getText());
+                        String recognizedText = text.getText();
+                        recognizedTextView.setText(recognizedText);
+
+                        // Actualizar el ViewModel
+                        sharedViewModel.setRecognizedText(recognizedText);
                     })
                     .addOnFailureListener(e -> {
                         // Manejar errores

@@ -12,10 +12,12 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.appmovil.R;
 import com.example.appmovil.databinding.FragmentRfidBinding;
 import com.example.appmovil.ui.carros.Vehiculo;
+import com.example.appmovil.ui.vista.ShareViewModel;
 import com.example.appmovil.ui.wifi.WifiHandler;
 
 import java.util.ArrayList;
@@ -33,6 +35,10 @@ public class RfidFragment extends Fragment {
     private LinearLayout vehicleContainer; // Contenedor para mostrar vehículos en pantalla
 
     public View slideshowView;
+
+    private ShareViewModel sharedViewModel;
+    private String recognizedPlaca = "";
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -46,6 +52,10 @@ public class RfidFragment extends Fragment {
         textView = binding.textHome;
 
         vehicleContainer = root.findViewById(R.id.vehicle_container);
+
+        sharedViewModel = new ViewModelProvider(requireActivity()).get(ShareViewModel.class);
+
+
 
         // Inicializar WifiHandler con la URL del servidor
         wifiHandler = new WifiHandler("192.168.4.1/latestUID"); // Cambiar por la IP/puerto del servidor
@@ -61,7 +71,18 @@ public class RfidFragment extends Fragment {
         };
         handler.post(refreshTask);
 
-        gestionParqueaderos("11111");
+        //gestionParqueaderos("11111");
+
+        // Observar cambios en el texto reconocido
+        sharedViewModel.getRecognizedText().observe(getViewLifecycleOwner(), recognizedText -> {
+            recognizedPlaca = recognizedText;
+
+            // Llamar a gestionParqueaderos con el último UID obtenido del servidor
+            String latestUID = DataManager.getInstance().getRfidData();
+            gestionParqueaderos("1111111");
+            //sharedViewModel.clearRecognizedText();
+        });
+
         return root;
     }
 
@@ -83,7 +104,7 @@ public class RfidFragment extends Fragment {
             for (Vehiculo vehiculo : vehiculos) {
                 // Crear cuadro para cada vehículo
                 TextView vehicleView = new TextView(getContext());
-                vehicleView.setText("ID: " + vehiculo.getUid() + "\nPlaca: " + vehiculo.getPlaca() + "\nEntrada: " + vehiculo.getHoraEntrada());
+                vehicleView.setText("ID: " + vehiculo.getUid() + "\nPlaca: " + vehiculo.getPlaca() +  "\nTipo: " + vehiculo.getTipo() + "\nEntrada: " + vehiculo.getHoraEntrada());
                 vehicleView.setPadding(16, 16, 16, 16);
                 vehicleView.setBackgroundColor(Color.parseColor("#DDDDDD"));
                 vehicleView.setTextColor(Color.BLACK);
@@ -124,15 +145,23 @@ public class RfidFragment extends Fragment {
             boolean condicion = (data == null || data.trim().isEmpty());
 
             if (vehiculos.size() <= 8 && !condicion) {
-                // Accede a un elemento de fragment_slideshow.xml (por ejemplo, un TextView)
-                TextView recognizedTextView = slideshowView.findViewById(R.id.text_recognized);
-                String placa = "";
-                if (recognizedTextView != null) {
-                    placa = recognizedTextView.getText().toString();
+                String placa = recognizedPlaca;
+                if (placa != null && !placa.trim().isEmpty()) {
+                    String lastThree = placa.length() >= 3 ? placa.substring(placa.length() - 3) : placa;
+
+                    boolean containsLetter = false;
+                    for (char c : lastThree.toCharArray()) {
+                        if (Character.isLetter(c)) {
+                            containsLetter = true;
+                            break;
+                        }
+                    }
+
+                    String tipoVehiculo = containsLetter ? "Moto" : "Carro";
+
+                    Vehiculo v = new Vehiculo(placa ,tipoVehiculo, data);
+                    vehiculos.add(v);
                 }
-                Vehiculo v = new Vehiculo(placa, data);
-                vehiculos.add(v);
-                System.out.println("uids agregado: "+vehiculos.toString());
             }
         } else {
             mostrarNotificacionSalida(vehiculoSaliente);

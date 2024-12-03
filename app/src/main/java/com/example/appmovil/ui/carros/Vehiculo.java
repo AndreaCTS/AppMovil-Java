@@ -5,14 +5,25 @@ import java.util.Date;
 public class Vehiculo {
     public String placa;
     public String uid;
+
+    public String tipo;
     public Date horaEntrada;
     public Date horaSalida;
 
-    public Vehiculo(String placa, String uid) {
+    public Vehiculo(String placa, String tipo, String uid) {
         this.placa = placa;
+        this.tipo = tipo;
         this.uid = uid;
         this.horaEntrada = new Date();
         this.horaSalida = null;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
     }
 
     public String getPlaca() {
