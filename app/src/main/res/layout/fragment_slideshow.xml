@@ -7,39 +7,47 @@
     android:layout_height="match_parent"
     tools:context=".ui.slideshow.SlideshowFragment">
 
-    <!-- Texto descriptivo -->
-    <TextView
-        android:id="@+id/textSlideshow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Slideshow Fragment"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="16dp" />
-
-    <!-- ImageView para mostrar la imagen completa procesada -->
-    <ImageView
-        android:id="@+id/imageView"
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:contentDescription="Imagen procesada"
-        android:scaleType="fitCenter"
-        app:layout_constraintTop_toBottomOf="@+id/textSlideshow"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
 
+        <!-- Vista de la cámara -->
+        <androidx.camera.view.PreviewView
+            android:id="@+id/camera_preview"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="3"
+            android:background="@android:color/black" />
 
-    <!-- ImageView para mostrar el recorte de la placa -->
-    <ImageView
-        android:id="@+id/plateImageView"
-        android:layout_width="0dp"
-        android:layout_height="200dp"
-        android:contentDescription="Imagen de la placa"
-        android:scaleType="fitCenter"
-        app:layout_constraintTop_toBottomOf="@+id/imageView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
+        <!-- Botón para capturar -->
+        <Button
+            android:id="@+id/capture_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Capturar" />
+
+        <!-- Imagen de la placa capturada -->
+        <ImageView
+            android:id="@+id/plate_image_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="8dp"
+            android:scaleType="centerInside"
+            android:background="@android:color/darker_gray" />
+
+        <!-- Texto del resultado de OCR -->
+        <TextView
+            android:id="@+id/text_recognized"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Texto reconocido aparecerá aquí"
+            android:textSize="16sp" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

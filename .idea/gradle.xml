@@ -13,6 +13,7 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/openCv" />
             <option value="$PROJECT_DIR$/sdk" />
+            <option value="$PROJECT_DIR$/usbCameraCommon" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />

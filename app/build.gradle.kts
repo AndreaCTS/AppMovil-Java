@@ -36,9 +36,14 @@ android {
 
 dependencies {
 
-    //implementation(libs.tesseract)
+    implementation(libs.textRecog)
+    implementation(libs.firebasee)
+    implementation(libs.firebase)
     implementation(libs.tesstwo)
-    //implementation(libs.opencv)
+    implementation(libs.camara)
+    implementation(libs.camaraa)
+    implementation(libs.camaraaa)
+    implementation(libs.camaraaaa)
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.constraintlayout)

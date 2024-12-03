@@ -25,3 +25,4 @@ rootProject.name = "AppMovil"
 include(":app")
 include(":sdk")
 include(":openCv")
+include(":usbCameraCommon")
