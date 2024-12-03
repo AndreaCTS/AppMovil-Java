@@ -76,16 +76,6 @@ public class SlideshowFragment extends Fragment {
         plateImageView = root.findViewById(R.id.plate_image_view);
         recognizedTextView = root.findViewById(R.id.text_recognized);
 
-        // Copia los datos de Tesseract al sistema de archivos del dispositivo
-        prepareTesseractData();
-
-        // Inicializar Tesseract
-        String dataPath = getActivity().getFilesDir() + "/tesseract/";
-        tessBaseAPI = new TessBaseAPI();
-        if (!tessBaseAPI.init(dataPath, "spa")) {
-            Log.e("Tesseract", "No se pudo inicializar Tesseract");
-        }
-
         // Iniciar la cámara
         cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext());
         cameraProviderFuture.addListener(() -> {
@@ -154,12 +144,6 @@ public class SlideshowFragment extends Fragment {
         return tempFile;
     }
 
-    private void processPlateImage(Bitmap capturedImage) {
-        // Aquí puedes agregar el procesamiento de la imagen (segmentación de la placa, OCR, etc.)
-        // Por ahora, solo simulamos un texto reconocido.
-        recognizedTextView.setText("Placa segmentada: ABC1234");
-    }
-
     private Bitmap processImage(Bitmap bitmap) {
 
         // Convertir Bitmap a Mat
@@ -220,7 +204,6 @@ public class SlideshowFragment extends Fragment {
                 Rect croppedRect = new Rect(x, y, width, height);
                 Mat croppedPlateRegion = new Mat(mat, croppedRect);
 
-
                 // Convertir a escala de grises
                 Mat gray = new Mat();
                 Imgproc.cvtColor(plateRegion, gray, Imgproc.COLOR_RGB2GRAY);
@@ -253,12 +236,6 @@ public class SlideshowFragment extends Fragment {
 
                 plateBitmap = Bitmap.createBitmap(matThreshold.cols(), matThreshold.rows(), Bitmap.Config.ARGB_8888);
                 Utils.matToBitmap(matThreshold, plateBitmap);
-
-                // Reconocer texto
-                //tessBaseAPI.setPageSegMode(TessBaseAPI.PageSegMode.PSM_SINGLE_BLOCK);
-                //tessBaseAPI.setImage(plateBitmap);
-                //recognizedText = tessBaseAPI.getUTF8Text().replaceAll("[^A-Z0-9]", ""); // Filtrar solo caracteres válidos
-                //Log.d("Tesseract", "Texto reconocido: " + recognizedText);
 
                 if (plateBitmap != null) {
                     // Llama al reconocimiento de texto usando ML Kit
@@ -307,33 +284,6 @@ public class SlideshowFragment extends Fragment {
 
 
 
-    private void prepareTesseractData() {
-        try {
-            String dataPath = getActivity().getFilesDir() + "/tesseract/";
-            File tessdataDir = new File(dataPath + "tessdata/");
-            if (!tessdataDir.exists()) {
-                tessdataDir.mkdirs();
-            }
-
-            File trainedDataFile = new File(tessdataDir, "spa.traineddata");
-            if (!trainedDataFile.exists()) {
-                InputStream inputStream = getActivity().getAssets().open("tessdata/spa.traineddata");
-                OutputStream outputStream = new FileOutputStream(trainedDataFile);
-
-                byte[] buffer = new byte[1024];
-                int read;
-                while ((read = inputStream.read(buffer)) != -1) {
-                    outputStream.write(buffer, 0, read);
-                }
-
-                outputStream.flush();
-                outputStream.close();
-                inputStream.close();
-            }
-        } catch (Exception e) {
-            Log.e("Tesseract", "Error copiando spa.traineddata", e);
-        }
-    }
 
     @Override
     public void onDestroyView() {

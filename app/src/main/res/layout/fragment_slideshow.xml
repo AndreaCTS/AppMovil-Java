@@ -8,7 +8,6 @@
     tools:context=".ui.slideshow.SlideshowFragment">
 
     <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -43,11 +42,12 @@
         <!-- Texto del resultado de OCR -->
         <TextView
             android:id="@+id/text_recognized"
-            android:layout_width="match_parent"
+            android:layout_width="376dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Texto reconocido aparecerá aquí"
-            android:textSize="16sp" />
+            android:text="Placas"
+            android:textSize="16sp"
+            android:gravity="center"/>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -32,11 +32,16 @@ public class RfidFragment extends Fragment {
     private ArrayList<Vehiculo> vehiculos= new ArrayList<>(); // Lista de vehículos en el parqueadero
     private LinearLayout vehicleContainer; // Contenedor para mostrar vehículos en pantalla
 
+    public View slideshowView;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentRfidBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        // Infla el diseño de fragment_slideshow.xml
+        slideshowView = inflater.inflate(R.layout.fragment_slideshow, container, false);
+
 
         textView = binding.textHome;
 
@@ -56,6 +61,7 @@ public class RfidFragment extends Fragment {
         };
         handler.post(refreshTask);
 
+        gestionParqueaderos("11111");
         return root;
     }
 
@@ -118,7 +124,13 @@ public class RfidFragment extends Fragment {
             boolean condicion = (data == null || data.trim().isEmpty());
 
             if (vehiculos.size() <= 8 && !condicion) {
-                Vehiculo v = new Vehiculo("nnn000", data);
+                // Accede a un elemento de fragment_slideshow.xml (por ejemplo, un TextView)
+                TextView recognizedTextView = slideshowView.findViewById(R.id.text_recognized);
+                String placa = "";
+                if (recognizedTextView != null) {
+                    placa = recognizedTextView.getText().toString();
+                }
+                Vehiculo v = new Vehiculo(placa, data);
                 vehiculos.add(v);
                 System.out.println("uids agregado: "+vehiculos.toString());
             }
